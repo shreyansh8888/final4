@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // NOTE: token.get(...) is used so phone-login users (who have no email)
+    // do not cause rule evaluation errors.
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.get('admin', false) == true ||
+        request.auth.token.get('email', '') == 'admin@garba.com' ||
+        request.auth.token.get('email', '').matches('.*admin.*') ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true)
+      );
+    }
+
+    // ─── Users ────────────────────────────────────────────────────────
+    // Owners can edit their profile but can never grant themselves isAdmin.
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) &&
+        request.resource.data.get('isAdmin', false) != true;
+      allow update: if (isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin'])) ||
+        isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // ─── Events ───────────────────────────────────────────────────────
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      // Signed-in users may only change booked_count (booking / cancelling).
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['booked_count'])
+      );
+    }
+
+    // ─── Bookings ─────────────────────────────────────────────────────
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated() && (
+        resource.data.user_id == request.auth.uid || isAdmin()
+      );
+      allow create: if isAuthenticated() &&
+        request.resource.data.user_id == request.auth.uid &&
+        request.resource.data.status == 'confirmed';
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        resource.data.user_id == request.auth.uid &&
+        request.resource.data.status == 'cancelled'
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ─── AI trainer practice sessions (private to each user) ──────────
+    match /practice_sessions/{sessionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.user_id == request.auth.uid || isAdmin()
+      );
+      allow create: if isAuthenticated() &&
+        request.resource.data.user_id == request.auth.uid;
+      allow update: if false;
+      allow delete: if isAuthenticated() &&
+        (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    // ─── Leaderboard (public to signed-in users, written by owner) ────
+    match /leaderboard/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) &&
+        request.resource.data.user_id == request.auth.uid;
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "628136898204",
+    "project_id": "test-c0bbe",
+    "storage_bucket": "test-c0bbe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628136898204:android:91619ad0c42619b106c759",
+        "android_client_info": {
+          "package_name": "com.example.garba_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnYy-cDxLrPynNJJqzEGx_kx_7NLvuRQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

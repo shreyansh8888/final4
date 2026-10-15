@@ -1,0 +1,35 @@
+{
+  "_PLACEHOLDER_": true,
+  "_INSTRUCTIONS_": [
+    "1. Go to https://console.firebase.google.com",
+    "2. Create a new project (or open existing one)",
+    "3. Click 'Add app' → Android",
+    "4. Enter your package name (e.g. com.yourname.garba_app)",
+    "5. Download google-services.json",
+    "6. Rename THIS file to google-services.json and replace its contents",
+    "7. Run: flutterfire configure",
+    "8. Uncomment the Firebase.initializeApp() call in lib/main.dart"
+  ],
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT_ID.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_MOBILESDK_APP_ID",
+        "android_client_info": {
+          "package_name": "com.yourname.garba_app"
+        }
+      },
+      "api_key": [{"current_key": "YOUR_API_KEY"}],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,25 @@
+workflows:
+  garba-android-release:
+    name: Garba App - Android Release APK
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      flutter: stable
+      vars:
+        PACKAGE_NAME: "com.example.garba_app"
+    scripts:
+      - name: Check Flutter setup
+        script: |
+          flutter --version
+          dart --version
+      - name: Resolve dependencies
+        script: |
+          flutter pub get
+      - name: Analyze Dart code (diagnostic only)
+        script: |
+          flutter analyze --no-pub || true
+      - name: Build release APK
+        script: |
+          flutter build apk --release --split-per-abi
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
