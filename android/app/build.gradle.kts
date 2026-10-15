@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -23,25 +24,14 @@ android {
         versionName = flutter.versionName
     }
 
-    // Stable signing key committed with the project so the SHA-1 / SHA-256
-    // fingerprints never change between Codemagic builds. Register these two
-    // fingerprints in Firebase (Project settings -> Your apps -> Android)
-    // otherwise Phone (OTP) sign-in will be rejected.
-    signingConfigs {
-        create("garba") {
-            storeFile = file("garba_debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
-
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("garba")
+            signingConfig = signingConfigs.getByName("debug")
         }
+
         release {
-            signingConfig = signingConfigs.getByName("garba")
+            // Keep the existing release signing configuration.
+            // Configure a valid release keystore before publishing.
         }
     }
 }
